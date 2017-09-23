@@ -22,11 +22,46 @@
         chatdb = cloudant.db.use('chatdb'),
         ticketsdb = cloudant.db.use('ticketsdb');
 
-    // usersDB.list().then(function (data) {
-    //     console.log(JSON.stringify(data, null, 2));
-    // }).catch(function (err) {
-    //     console.log(err);
-    // })
+    ticketsdb.view('open-tickets-view', 'closed-tickets-view',{ include_docs: true }, function (err, body) {
+        if (!err) {
+            console.log(JSON.stringify(body,null, 2));
+        } else {
+            console.log(JSON.stringify(err,null, 2));
+        }
+    });
+
+    var getDocumentCounts = function (status) {
+        return new Promise(function (resolve, reject) {
+            //             //console.log(JSON.stringify(result,null,2));
+            //             resolve(result.translations[0].translation);
+            //         });
+            ticketsdb.list({ include_docs: true }, function (err, data) {
+                if (err) {
+                    reject(err);
+                }
+                if (data) {
+                    var count = 0;
+                    data.rows.forEach(function (element) {
+                        if (element.doc.Status == status) {
+                            count++;
+                        };
+                    });
+
+                    resolve(count);
+                }
+                // console.log(JSON.stringify(data.rows[1], null, 2));
+            });
+        })
+    };
+
+    // var res = getDocumentCounts("Close");
+    // res.then(function (result) {
+    //     console.log(result);
+    // });
+    // var res = getDocumentCounts("Open");
+    // res.then(function (result) {
+    //     console.log(result);
+    // });
 
 
 
@@ -149,7 +184,7 @@
                 + JSON.stringify(data, null, 2)
             );
 
-            udpateToDB(ticketsdb,data);
+            udpateToDB(ticketsdb, data);
 
 
         }).catch(function (err) {
@@ -158,7 +193,7 @@
 
     };
 
-    updateExistingTicket();
+    // updateExistingTicket();
 
 
 
