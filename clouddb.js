@@ -22,37 +22,53 @@
         chatdb = cloudant.db.use('chatdb'),
         ticketsdb = cloudant.db.use('ticketsdb');
 
-    ticketsdb.view('open-tickets-view', 'closed-tickets-view',{ include_docs: true }, function (err, body) {
-        if (!err) {
-            console.log(JSON.stringify(body,null, 2));
-        } else {
-            console.log(JSON.stringify(err,null, 2));
-        }
+    // ticketsdb.view('open-tickets-view', 'closed-tickets-view', { include_docs: true }, function (err, body) {
+    //     if (!err) {
+    //         console.log(JSON.stringify(body, null, 2));
+    //     } else {
+    //         console.log(JSON.stringify(err, null, 2));
+    //     }
+    // });
+
+    function callView(DesignName, ViewName, include_docs = false) {
+        return ticketsdb.view(DesignName, ViewName, { include_docs: include_docs }, function (err, body) {
+            if (!err) {
+                // console.log(JSON.stringify(body, null, 2));
+                return body;
+            } else {
+                // console.log(JSON.stringify(err, null, 2));
+                return err;
+            }
+        });
+    }
+
+    callView("Severity", "Severity").then(function (data) {
+        console.log(JSON.stringify(data, null, 2));
     });
 
-    var getDocumentCounts = function (status) {
-        return new Promise(function (resolve, reject) {
-            //             //console.log(JSON.stringify(result,null,2));
-            //             resolve(result.translations[0].translation);
-            //         });
-            ticketsdb.list({ include_docs: true }, function (err, data) {
-                if (err) {
-                    reject(err);
-                }
-                if (data) {
-                    var count = 0;
-                    data.rows.forEach(function (element) {
-                        if (element.doc.Status == status) {
-                            count++;
-                        };
-                    });
+    // var getDocumentCounts = function (status) {
+    //     return new Promise(function (resolve, reject) {
+    //         //             //console.log(JSON.stringify(result,null,2));
+    //         //             resolve(result.translations[0].translation);
+    //         //         });
+    //         ticketsdb.list({ include_docs: true }, function (err, data) {
+    //             if (err) {
+    //                 reject(err);
+    //             }
+    //             if (data) {
+    //                 var count = 0;
+    //                 data.rows.forEach(function (element) {
+    //                     if (element.doc.Status == status) {
+    //                         count++;
+    //                     };
+    //                 });
 
-                    resolve(count);
-                }
-                // console.log(JSON.stringify(data.rows[1], null, 2));
-            });
-        })
-    };
+    //                 resolve(count);
+    //             }
+    //             // console.log(JSON.stringify(data.rows[1], null, 2));
+    //         });
+    //     })
+    // };
 
     // var res = getDocumentCounts("Close");
     // res.then(function (result) {
